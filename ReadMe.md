@@ -90,12 +90,16 @@
 
   ```bash
   python train_transitionNet.py --moe_model YOUR_MANIFOLD_MODEL
+
+  python train_transitionNet.py --moe_model results/StyleVAE2_style100/myResults/24/m_save_model_180
   ```
 
   After training, you can validate the model by running:
 
   ```bash
   python train_trainsitionNet.py --test --moe_model YOUR_MANIFOLD_MODEL --version YOUR_VERSION --epoch YOUR_EPOCH
+
+  python train_transitionNet.py --test --moe_model results/StyleVAE2_style100/myResults/24/m_save_model_180 --version 1 --epoch 191
   ```
 
   The output result is `test_net.bvh`.

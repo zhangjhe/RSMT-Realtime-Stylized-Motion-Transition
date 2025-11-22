@@ -8,6 +8,7 @@ from src.Datasets.BaseLoader import BasedLoader, BasedDataProcessor
 from src.utils.BVH_mod import read_bvh
 from src.utils.motion_process import subsample
 
+from src.Datasets.augmentation import TemporalScale,BatchMirror
 
 class Swap100StyJoints():
     def __call__(self,quats,offsets,parents,names):
@@ -170,7 +171,6 @@ class StyleLoader():
         pickle.dump(all_motions, f)
         f.close()
     def augment_dataset(self):
-        from src.Datasets.augmentation import TemporalScale,BatchMirror
         folder = "./MotionData/100STYLE/"
         self._load_skeleton(folder)
         mirror = BatchMirror(self.skeleton,1.)
@@ -186,7 +186,7 @@ class StyleLoader():
                     hips = torch.from_numpy(seq['hips']).unsqueeze(0).float().cuda()
                     # mirror
                     gp,gq = self.skeleton.forward_kinematics(quats,offsets,hips)
-                    gp,gq = mirror(gp,gq)
+                    # gp,gq = mirror(gp,gq)
                     mirror_hips,mirror_quats = self.skeleton.inverse_kinematics(gq,gp)
                     mirror_hips,mirror_quats = mirror_hips.squeeze(0).cpu().numpy(),mirror_quats.squeeze(0).cpu().numpy()
                     motions[style]["mr_"+content] = {"quats":mirror_quats,"offsets":seq['offsets'],"hips":mirror_hips}
@@ -222,7 +222,6 @@ class StyleLoader():
         self.train_motions = {}
         self.test_motions = {}
         # 镜像数据集：
-        from src.Datasets.BatchProcessor import BatchMirror
         batch_mirror = BatchMirror(self.skeleton, 1.)
         for style in self.style_names[:-10]:
             self.train_motions[style]={}

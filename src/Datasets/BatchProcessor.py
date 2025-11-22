@@ -48,7 +48,9 @@ class BatchProcessData(torch.nn.Module):#(B,T,J,dim)
     def __init__(self):
         super(BatchProcessData, self).__init__()
     def forward(self,global_rotations,global_positions):
-        ref_vector = torch.cross(global_positions[...,5:6,:]-global_positions[...,1:2,:],torch.tensor([0,1,0],dtype=global_positions.dtype,device=global_positions.device),dim=-1)
+        # global_positions = global_positions.squeeze(0)
+        # global_rotations = global_rotations.squeeze(0)
+        ref_vector = torch.cross(global_positions[...,5:6,:]-global_positions[...,1:2,:],torch.tensor([0,1,0],dtype=global_positions.dtype,device=global_positions.device).expand(global_positions[...,0:1,:].shape),dim=-1)
 
         root_rotation = from_to_1_0_0(ref_vector)
         """ Local Space """

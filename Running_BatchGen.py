@@ -7,7 +7,7 @@ from src.utils.BVH_mod import Skeleton, find_secondary_axis
 
 
 def load_model():
-    model = torch.load('./results/Transitionv2_style100/myResults/1/m_save_model_191')
+    model = torch.load('./results/Transitionv2_style100/myResults/1/m_save_model_57')
     return model
 def load_dataSet():
     loader = StyleLoader()
@@ -64,8 +64,8 @@ class RunningLongSeq():
 
         # tar_id = [300,90,130,170,210,250,290,330]
         # self.time = [10,10,10,10,10,80,40,40]
-        tar_id = [80,160,240,320, 400, 480, 560]
-        self.time = [80,80,80,80, 80, 80, 80]
+        tar_id = [80,160,240,320]
+        self.time = [80,80,80,80]
         get_tar_property = lambda property: [property[:,tar_id[i]-2:tar_id[i]] for i in range(len(tar_id))]
         self.X_tar = get_tar_property(self.X)
         self.Q_tar = get_tar_property(self.Q)
@@ -149,30 +149,30 @@ def synthesize(model, gp, gq, phases, tar_pos, tar_quat, pos_offset, skeleton: S
 
 
 if __name__ =="__main__":
-    model = load_model()
-    loader = load_dataSet()
-    anim = BVH.read_bvh("source.bvh")
-    motions = loader.train_motions['LeftHop']["BR"]
-    tar_motions = loader.train_motions['Neutral']["FR"]
+        model = load_model()
+        loader = load_dataSet()
+        anim = BVH.read_bvh("source.bvh")
+        motions = loader.train_motions['Teapot']["BR"]
+        tar_motions = loader.train_motions['Teapot']["FR"]
 
-    def extract_property(motions):
-        X = torch.from_numpy(motions['hip_pos'][0]).unsqueeze(0)
-        Q = torch.from_numpy(motions['quats'][0]).unsqueeze(0)
-        A = torch.from_numpy(motions['A'][0]).unsqueeze(0)/0.1
-        S = torch.from_numpy(motions['S'][0]).unsqueeze(0)
-        return X,Q,A,S
+        def extract_property(motions):
+            X = torch.from_numpy(motions['hip_pos'][0]).unsqueeze(0)
+            Q = torch.from_numpy(motions['quats'][0]).unsqueeze(0)
+            A = torch.from_numpy(motions['A'][0]).unsqueeze(0)/0.1
+            S = torch.from_numpy(motions['S'][0]).unsqueeze(0)
+            return X,Q,A,S
 
-
-    X, Q, A, S = extract_property(motions)
-    pos_offset = torch.from_numpy(motions['offsets'][0]).unsqueeze(0)
-    with torch.no_grad():
-        running_machine = RunningLongSeq(model,X,Q,A,S,X,Q,pos_offset,anim.skeleton)
-        running_machine.iteration()
-        anim.hip_pos,anim.quats = running_machine.get_source()
-        BVH.save_bvh("source.bvh",anim)
-        anim.hip_pos,anim.quats = running_machine.get_results()
-        BVH.save_bvh("results_T80.bvh",anim)
-        anim.hip_pos, anim.quats = running_machine.get_target()
-        BVH.save_bvh("target_T80.bvh", anim)
+        X, Q, A, S = extract_property(motions)
+        pos_offset = torch.from_numpy(motions['offsets'][0]).unsqueeze(0)
+        for i in range(30):
+            with torch.no_grad():
+                running_machine = RunningLongSeq(model,X,Q,A,S,X,Q,pos_offset,anim.skeleton)
+                running_machine.iteration()
+                anim.hip_pos, anim.quats = running_machine.get_source()
+                # BVH.save_bvh("source.bvh",anim)
+                anim.hip_pos, anim.quats = running_machine.get_results()
+                BVH.save_bvh(f"results/RSMT-3/motion_1.pred{i}.T80.bvh",anim)
+                anim.hip_pos, anim.quats = running_machine.get_target()
+                BVH.save_bvh("results/RSMT-3/target.T80.bvh", anim)
 
 

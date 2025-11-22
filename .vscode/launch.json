@@ -1,0 +1,58 @@
+{
+    "configurations": [
+        {
+            "name": "python process_dataset.py --train_phase_model",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./process_dataset.py",
+            "console": "integratedTerminal",
+            "python": "/root/miniconda3/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:/root/autodl-tmp/CAMDM/PyTorch:/root/autodl-tmp/CAMDM/"
+            },
+            "args": [
+                "--train_phase_model"
+            ]
+        },
+        {
+            "name": "python train_deephase.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./train_deephase.py",
+            "console": "integratedTerminal",
+            "python": "/root/miniconda3/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:/root/autodl-tmp/CAMDM/PyTorch:/root/autodl-tmp/CAMDM/"
+            }
+        },
+        {
+            // nohup python train_styleVAE.py --version 11 --epoch 45 --resume
+            "name": "python train_styleVAE.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./train_styleVAE.py",
+            "console": "integratedTerminal",
+            "python": "/root/miniconda3/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:/root/autodl-tmp/CAMDM/PyTorch:/root/autodl-tmp/CAMDM/"
+            },
+            "args": [
+                "--version", "11",
+                "--epoch", "45",
+                "--resume"
+            ]
+        },
+        {
+            // nohup python train_styleVAE.py --version 11 --epoch 45 --resume
+            "name": "python Running_BatchGen.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./Running_BatchGen.py",
+            "console": "integratedTerminal",
+            "python": "/root/miniconda3/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:/root/autodl-tmp/CAMDM/PyTorch:/root/autodl-tmp/CAMDM/"
+            },
+        },
+    ]
+}

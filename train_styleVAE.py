@@ -37,7 +37,7 @@ def create_common_states(prefix:str):
     parser = ArgumentParser()
     parser.add_argument("--dev_run", action="store_true")
     parser.add_argument("--version", type=str, default="-1")
-    parser.add_argument("--epoch",type=str,default="last")
+    parser.add_argument("--epoch",type=str, default="last")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--test",action="store_true")
     args = parser.parse_args()
@@ -68,6 +68,7 @@ def create_common_states(prefix:str):
                     check_file += out[0]
                     print(check_file)
                     break
+        print(f"loaded checkpoint{check_file}")
         resume_from_checkpoint = check_file  # results/version/last.ckpt"
     else:
         resume_from_checkpoint = None
@@ -92,7 +93,7 @@ def training_style100():
     data_set = "style100"
     prefix += "_" + data_set
     args, trainer_dict, resume_from_checkpoint, ckpt_path = create_common_states(prefix)
-    resume_from_checkpoint = None
+    # resume_from_checkpoint = None
     loader = WindowBasedLoader(61, 21, 1)
     dt = 1. / 30.
     phase_dim = 10
@@ -105,7 +106,12 @@ def training_style100():
         '''Create the model'''
         style_loader = StyleLoader()
         data_module = StyleVAE_DataModule(style_loader, phase_file + loader.get_postfix_str(),style_file_name=None, dt=dt, batch_size=batch_size, mirror=0.0)  # when apply phase, should avoid mirror
-        model = StyleVAENet(data_module.skeleton,  phase_dim=phase_dim, latent_size=latent_size,batch_size=batch_size,mode='pretrain',net_mode=net_mode)
+        # data_module = StyleVAE_DataModule(style_loader, phase_file,style_file_name=None, dt=dt, batch_size=batch_size, mirror=0.0)  # when apply phase, should avoid mirror
+        if args.resume:
+            # model = StyleVAENet.load_from_checkpoint(checkpoint_path=resume_from_checkpoint, moe_decoder=None,pose_channels=6,net_mode=net_mode)
+            model = StyleVAENet.load_from_checkpoint(resume_from_checkpoint)
+        else:
+            model = StyleVAENet(data_module.skeleton,  phase_dim=phase_dim, latent_size=latent_size,batch_size=batch_size,mode='pretrain',net_mode=net_mode)
         if (args.dev_run):
             trainer = Trainer(**trainer_dict, **test_model(),
                               **select_gpu_par(), precision=32, reload_dataloaders_every_n_epochs=1,#gradient_clip_val=1.0,#**detect_nan_par(),
